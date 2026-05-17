@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#080808">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com; img-src * data:; media-src *;">
+<title>TiwhiMode — Visual Artist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --off-white: #f0ece3;
+    --accent: #ff3d1f;
+    --accent2: #f5c800;
+    --mid: #1e1e1e;
+    --muted: #777;
+    --nav-h: 68px;
+  }
+  /* Force dark — ignore system light/dark preference */
+  @media (prefers-color-scheme: light) {
+    html, body { background: #080808 !important; color: #f0ece3 !important; }
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; background: #080808 !important; color-scheme: dark; }
+  body { background: #080808 !important; color: var(--off-white); font-family: 'Space Mono', monospace; overflow-x: hidden; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    height: var(--nav-h); background: #080808;
+    border-bottom: 1px solid var(--mid);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 48px;
+  }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 0.14em; color: var(--off-white); text-decoration: none; }
+  .logo span { color: var(--accent); }
+
+  .nav-links { list-style: none; display: flex; align-items: center; }
+  .nav-links li { display: flex; align-items: center; }
+  .nav-links li + li::before { content: ''; display: inline-block; width: 1px; height: 13px; background: #2e2e2e; margin: 0 24px; }
+  .nav-links a { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--off-white); }
+
+  /* hamburger — hidden on desktop */
+  .hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+  .hamburger span { display: block; width: 22px; height: 1px; background: var(--off-white); transition: all 0.3s ease; }
+  .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  /* mobile nav drawer */
+  .nav-drawer {
+    display: none;
+    position: fixed; top: var(--nav-h); left: 0; right: 0; bottom: 0;
+    background: #080808; z-index: 199;
+    flex-direction: column; align-items: center; justify-content: center; gap: 40px;
+  }
+  .nav-drawer.open { display: flex; }
+  .nav-drawer a { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 0.1em; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  .nav-drawer a:hover { color: var(--off-white); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh; padding-top: var(--nav-h);
+    display: flex; align-items: flex-end;
+    padding-left: 48px; padding-right: 48px; padding-bottom: 72px;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 55% 70% at 72% 28%, rgba(255,61,31,0.10) 0%, transparent 60%),
+                radial-gradient(ellipse 35% 50% at 18% 75%, rgba(245,200,0,0.05) 0%, transparent 55%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: linear-gradient(rgba(240,236,227,0.025) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(240,236,227,0.025) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 960px; }
+  .hero-tag { display: inline-block; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.22em; color: var(--accent); margin-bottom: 20px; opacity: 0; animation: fadeUp 0.7s ease 0.3s forwards; }
+  .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px, 11vw, 175px); line-height: 0.88; letter-spacing: -0.01em; margin-bottom: 32px; opacity: 0; animation: fadeUp 0.9s ease 0.5s forwards; }
+  .hero-title .outline { display: block; color: transparent; -webkit-text-stroke: 1px var(--off-white); }
+  .hero-title .acc { color: var(--accent); -webkit-text-stroke: 0; }
+  .hero-sub { font-size: 11px; line-height: 2; color: var(--muted); max-width: 380px; opacity: 0; animation: fadeUp 0.9s ease 0.7s forwards; margin-bottom: 40px; }
+  .hero-cta { display: inline-flex; align-items: center; gap: 12px; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--black); background: var(--off-white); padding: 14px 28px; text-decoration: none; opacity: 0; animation: fadeUp 0.9s ease 0.9s forwards; transition: background 0.2s, color 0.2s; }
+  .hero-cta:hover { background: var(--accent); color: var(--off-white); }
+  .scroll-indicator { position: absolute; bottom: 32px; right: 48px; display: flex; align-items: center; gap: 12px; font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); opacity: 0; animation: fadeUp 1s ease 1.1s forwards; }
+  .scroll-line-s { width: 36px; height: 1px; background: var(--accent); }
+
+  /* ── DIVIDER ── */
+  .section-divider { height: 1px; background: var(--mid); margin: 0 48px; }
+
+  /* ── PORTFOLIO ── */
+  #portfolio { padding: 80px 48px; }
+  .section-label { font-family: 'Bebas Neue', sans-serif; font-size: clamp(28px, 4.5vw, 56px); letter-spacing: 0.06em; margin-bottom: 40px; }
+
+  .gallery-filters { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 40px; border: 1px solid var(--mid); width: fit-content; }
+  .filter-btn { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 18px; background: transparent; border: none; border-right: 1px solid var(--mid); color: var(--muted); cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .filter-btn:last-child { border-right: none; }
+  .filter-btn.active, .filter-btn:hover { background: var(--accent); color: var(--off-white); }
+
+  /* PHOTO GRID — 2 column portrait, landscape spans full width, exact natural size */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 6px;
+    padding: 10px;
+  }
+
+  /* Image control */
+  .photo-grid .grid-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+  }
+
+  .grid-item {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .grid-item:hover img { filter: saturate(1); }
+
+  /* Landscape spans full width */
+  .grid-item.landscape {
+    grid-column: span 2;
+  }
+
+  .grid-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(8,8,8,0.75) 0%, transparent 60%);
+    display: flex; align-items: flex-end;
+    padding: 14px; opacity: 0; transition: opacity 0.3s ease;
+  }
+  .grid-item:hover .grid-overlay { opacity: 1; }
+  .overlay-cat { font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); }
+
+  /* placeholder slots */
+  .photo-slot {
+    width: 100%;
+    aspect-ratio: 2/3;
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px;
+    cursor: pointer; position: relative; transition: opacity 0.2s;
+  }
+  .photo-slot.landscape { aspect-ratio: 16/9; grid-column: span 2; }
+  .photo-slot:hover { opacity: 0.8; }
+  .ps1{background:#111008;} .ps2{background:#081111;} .ps3{background:#110811;}
+  .ps4{background:#110808;} .ps5{background:#08080f;} .ps6{background:#0f0f08;}
+  .ps7{background:#110a08;} .ps8{background:#080f0a;} .ps9{background:#0a1108;}
+  .slot-lbl { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #3a3a3a; }
+  .slot-ico { font-size: 18px; color: #2a2a2a; }
+
+  /* VIDEO GRID */
+  .video-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  /* landscape = 16/9, portrait = 9/16 */
+  .video-card { position: relative; cursor: pointer; overflow: hidden; background: #111; }
+  .video-card.landscape .video-thumb-wrap { aspect-ratio: 16/9; }
+  .video-card.portrait .video-thumb-wrap { aspect-ratio: 9/16; }
+  .video-thumb-wrap { position: relative; width: 100%; overflow: hidden; }
+  .video-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease, filter 0.3s ease; filter: saturate(0.8) brightness(0.85); }
+  .video-card:hover .video-thumb-wrap img { transform: scale(1.04); filter: saturate(1) brightness(1); }
+  .video-play-btn {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 54px; height: 54px;
+    background: rgba(8,8,8,0.75);
+    border: 2px solid var(--off-white);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    pointer-events: none;
+  }
+  .video-card:hover .video-play-btn { background: var(--accent); border-color: var(--accent); transform: translate(-50%, -50%) scale(1.1); }
+  .video-info { padding: 10px 12px 12px; }
+  .video-title { font-family: 'DM Serif Display', serif; font-size: 14px; color: var(--off-white); margin-bottom: 4px; }
+  .video-meta { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+
+  /* VIDEO INPUT FORM */
+  .video-add-wrap {
+    margin-bottom: 32px;
+    display: flex; align-items: stretch; gap: 0;
+    max-width: 600px;
+  }
+  .video-url-input {
+    flex: 1; background: #0f0f0f; border: 1px solid var(--mid);
+    border-right: none; color: var(--off-white);
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    padding: 12px 16px; outline: none; transition: border-color 0.2s;
+  }
+  .video-url-input:focus { border-color: var(--accent); }
+  .video-url-input::placeholder { color: #444; }
+  .video-title-input {
+    width: 200px; background: #0f0f0f; border: 1px solid var(--mid);
+    border-right: none; color: var(--off-white);
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    padding: 12px 16px; outline: none; transition: border-color 0.2s;
+  }
+  .video-title-input:focus { border-color: var(--accent); }
+  .video-title-input::placeholder { color: #444; }
+  .add-video-btn {
+    background: var(--accent); border: none; color: var(--off-white);
+    font-family: 'Space Mono', monospace; font-size: 9px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 12px 20px; cursor: pointer; white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .add-video-btn:hover { background: #ff5a3f; }
+  .video-input-row { display: flex; gap: 0; flex: 1; }
+
+  /* hidden section management */
+  .gallery-section { display: none; }
+  .gallery-section.active { display: block; }
+  .gallery-section.active.video-section { display: block; }
+
+  /* ── ABOUT ── */
+  #about { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; padding: 80px 48px; }
+  .about-frame { display: inline-block; position: relative; max-width: 280px; width: 100%; }
+  .about-frame img { width: 100%; height: auto; display: block; }
+  /*
+    PORTRAIT: Replace <div class="about-img-slot"> with:
+    <img src="images/portrait.webp" alt="TiwhiMode" />
+    The image will display at its natural proportions, capped at 280px wide.
+  */
+  .about-img-slot { width: 260px; aspect-ratio: auto; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; background: none; border: px solid var(--mid); }
+  .about-accent-border { position: absolute; bottom: -14px; right: -14px; width: 80px; height: 80px; border: 2px solid var(--accent); z-index: -1; }
+  .stats-row { display: flex; gap: 32px; margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--mid); }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: var(--accent); line-height: 1; }
+  .stat-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+  .about-quote { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 19px; color: var(--off-white); line-height: 1.5; margin-bottom: 24px; padding-left: 18px; border-left: 2px solid var(--accent); }
+  .about-desc { font-size: 12px; line-height: 2.1; color: var(--muted); margin-bottom: 28px; }
+  .skills-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .skill-tag { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; border: 1px solid #252525; padding: 6px 12px; color: var(--muted); }
+
+  /* ── CONTACT ── */
+  #contact { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; padding: 80px 48px; }
+  .contact-big { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 4.5vw, 68px); line-height: 0.92; margin-bottom: 32px; }
+  .contact-big span { color: var(--accent); display: block; }
+  .contact-desc { font-size: 12px; line-height: 2; color: var(--muted); margin-bottom: 36px; }
+  .contact-links { display: flex; flex-direction: column; }
+  .contact-link { display: flex; align-items: center; gap: 14px; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; padding: 16px 0; border-bottom: 1px solid #161616; }
+  .contact-link:first-child { border-top: 1px solid #161616; }
+  .contact-link:hover { color: var(--accent2); }
+  .contact-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  .contact-form { display: flex; flex-direction: column; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 7px; }
+  .form-label { font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+  .form-input, .form-textarea { background: #0f0f0f; border: 1px solid #1e1e1e; color: var(--off-white); font-family: 'Space Mono', monospace; font-size: 12px; padding: 13px 16px; outline: none; transition: border-color 0.2s; resize: none; width: 100%; }
+  .form-input:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-input::placeholder, .form-textarea::placeholder { color: #333; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .submit-btn { background: transparent; border: 1px solid var(--off-white); color: var(--off-white); font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; padding: 14px 26px; cursor: pointer; display: inline-flex; align-items: center; gap: 12px; transition: background 0.2s, border-color 0.2s, color 0.2s; margin-top: 6px; }
+  .submit-btn:hover { background: var(--accent); border-color: var(--accent); }
+  .form-success { display: none; font-size: 11px; color: var(--accent2); letter-spacing: 0.12em; padding: 10px 0; }
+
+  /* ── FOOTER ── */
+  footer { border-top: 1px solid var(--mid); padding: 28px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.14em; }
+  .footer-logo span { color: var(--accent); }
+  .footer-socials { display: flex; align-items: center; gap: 20px; }
+  .footer-social-link { color: var(--muted); transition: color 0.2s; text-decoration: none; display: flex; align-items: center; }
+  .footer-social-link:hover { color: var(--off-white); }
+  .footer-social-link svg { width: 20px; height: 20px; }
+  .footer-copy { font-size: 9px; letter-spacing: 0.16em; color: var(--muted); text-transform: uppercase; }
+
+  /* ── LIGHTBOX ── */
+  .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 500; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+  .lightbox.open { opacity: 1; pointer-events: all; }
+  .lightbox-close { position: absolute; top: 24px; right: 36px; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: color 0.2s; z-index: 2; }
+  .lightbox-close:hover { color: var(--accent); }
+  .lightbox-inner { max-width: 90vw; max-height: 90vh; text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .lightbox-img { max-width: 90vw; max-height: 80vh; width: auto; height: auto; display: block; margin-bottom: 16px; }
+  .lightbox-video { width: min(860px, 90vw); aspect-ratio: 16/9; border: none; }
+  .lightbox-title { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 4px; }
+  .lightbox-cat { font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); }
+  .lightbox-ph { width: min(500px, 80vw); aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: #444; border: 1px solid #1e1e1e; margin-bottom: 16px; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; }
+
+  /* VIEW MORE / LESS */
+  .paged-item { display: none; }
+  .vm-hidden { display: none !important; }
+  .view-more-wrap { text-align: center; margin-top: 40px; margin-bottom: 8px; }
+  .view-more-btn {
+    background: transparent;
+    border: 1px solid var(--mid);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 14px 36px; cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .view-more-btn:hover { border-color: var(--accent); color: var(--off-white); background: var(--accent); }
+
+  /* SCROLL TO TOP */
+  .scroll-top-btn {
+    position: fixed; bottom: 28px; right: 28px;
+    width: 44px; height: 44px;
+    background: var(--accent); border: none; border-radius: 50%;
+    color: var(--off-white); font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 300; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 20px rgba(255,61,31,0.4);
+  }
+  .scroll-top-btn.visible { opacity: 1; pointer-events: all; }
+  .scroll-top-btn:hover { transform: translateY(-3px); }
+
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    :root { --nav-h: 60px; }
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    #hero { padding-left: 20px; padding-right: 20px; padding-bottom: 60px; }
+    .hero-tag { font-size: 14px; }
+    .hero-sub { font-size: 11px; max-width: 100%; }
+    .scroll-indicator { display: none; }
+    .section-divider { margin: 0 20px; }
+    #portfolio { padding: 60px 20px; }
+    .gallery-filters { width: 100%; overflow-x: auto; border: none; gap: 6px; }
+    .filter-btn { border: 1px solid var(--mid) !important; font-size: 9px; padding: 8px 14px; flex-shrink: 0; }
+    /* photo grid stays 2 columns on mobile — no override needed */
+
+    /* Videos stay side by side on mobile — just smaller */
+    .video-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+    /* Portrait videos stack on very small screens */
+    .video-card.portrait .video-thumb-wrap { aspect-ratio: 3/4; }
+    .video-card.landscape .video-thumb-wrap { aspect-ratio: 16/9; }
+    .video-play-btn { width: 38px; height: 38px; font-size: 14px; }
+
+    #about { grid-template-columns: 1fr; gap: 48px; padding: 60px 20px; }
+    .about-frame { max-width: 100%; }
+    .stats-row { gap: 20px; }
+    .stat-num { font-size: 36px; }
+    #contact { grid-template-columns: 1fr; gap: 48px; padding: 60px 20px; }
+    .form-row { grid-template-columns: 1fr; }
+    .contact-big { font-size: clamp(32px, 10vw, 56px); }
+    footer { padding: 24px 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
+    .footer-socials { gap: 16px; }
+    .scroll-top-btn { bottom: 20px; right: 20px; width: 40px; height: 40px; font-size: 16px; }
+  }
+
+  @media (max-width: 400px) {
+    .hero-title { font-size: 52px; }
+    /* On very small phones, portrait videos stack */
+    .video-grid.portrait-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SCROLL TO TOP -->
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Back to top">↑</button>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-close" id="lightboxClose">[ Close ]</div>
+  <div class="lightbox-inner" id="lightboxInner"></div>
+</div>
+
+<!-- MOBILE NAV DRAWER -->
+<div class="nav-drawer" id="navDrawer">
+  <a href="#portfolio" class="drawer-link">Work</a>
+  <a href="#about" class="drawer-link">About</a>
+  <a href="#contact" class="drawer-link">Contact</a>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="logo">Tiwhi<span>Mode</span></a>
+  <ul class="nav-links">
+    <li><a href="#portfolio">Work</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content" id="heroContent">
+    <div class="hero-tag">Photographer &amp; Videographer</div>
+    <h1 class="hero-title">
+      Visual<br>
+      <span class="outline">Story<span class="acc">teller</span></span>
+    </h1>
+    <p class="hero-sub">Capturing moments that live beyond the frame — crafted with intention, delivered with impact.</p>
+    <a href="#portfolio" class="hero-cta" id="viewWorkBtn">View Work →</a>
+  </div>
+  <div class="scroll-indicator">
+    <div class="scroll-line-s"></div>
+    Scroll
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <h2 class="section-label reveal">Selected Work</h2>
+
+  <div class="gallery-filters reveal">
+    <button class="filter-btn active" data-filter="all">All Work</button>
+    <button class="filter-btn" data-filter="Fashion">Fashion</button>
+    <button class="filter-btn" data-filter="Portraits">Portraits</button>
+    <button class="filter-btn" data-filter="brandworks">brandworks</button>
+    <button class="filter-btn" data-filter="musicvideos">Music Videos</button>
+  </div>
+
+  <!-- SINGLE PHOTO GRID — all photos live here, filter buttons show/hide by data-cat -->
+  <!--
+    HOW TO ADD PHOTOS:
+    <div class="grid-item" data-cat="Fashion">
+      <img src="images/fashion-01.webp" alt="" />
+      <div class="grid-overlay"><span class="overlay-cat">Fashion</span></div>
+    </div>
+
+    data-cat values: Fashion / Portraits / brandworks
+    Just add photos here — All Work shows everything automatically.
+    Filter tabs show only matching data-cat items.
+  -->
+  <div class="photo-grid" id="mainGrid">
+    <!-- Add your photos here -->
+<div class="grid-item" data-cat="Portraits"><img src="images/ps2.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps3.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps4.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps5.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps6.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps7.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps8.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps9.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps11.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps12.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps13.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps14.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps16.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps18.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps20.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps25.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps26.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps27.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps29.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps51.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps31.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps32.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps33.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps34.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps35.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps36.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps37.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps38.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps39.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps40.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps41.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps42.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps43.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps44.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps48.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps45.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps49.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps50.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+<div class="grid-item" data-cat="Portraits"><img src="images/ps30.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Portraits</span></div>
+</div>
+
+<div class="grid-item" data-cat="brandworks"><img src="images/ps17c.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">brandworks</span></div>
+</div>
+<div class="grid-item" data-cat="brandworks"><img src="images/ps21c.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">brandworks</span></div>
+</div>
+<div class="grid-item" data-cat="brandworks"><img src="images/ps22c.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">brandworks</span></div>
+</div>
+<div class="grid-item" data-cat="brandworks"><img src="images/ps23c.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">brandworks</span></div>
+</div>
+
+
+
+<div class="grid-item" data-cat="Fashion"><img src="images/ps1f.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Fashion</span></div>
+</div>
+<div class="grid-item" data-cat="Fashion"><img src="images/ps10f.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Fashion</span></div>
+</div>
+<div class="grid-item" data-cat="Fashion"><img src="images/ps19f.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Fashion</span></div>
+</div>
+<div class="grid-item" data-cat="Fashion"><img src="images/ps28f.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Fashion</span></div>
+</div>
+<div class="grid-item" data-cat="Fashion"><img src="images/ps46f.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Fashion</span></div>
+</div>
+<div class="grid-item" data-cat="Fashion"><img src="images/ps47f.webp" alt="" />
+  <div class="grid-overlay"><span class="overlay-cat">Fashion</span></div>
+</div>
+  </div>
+  <div class="view-more-wrap" id="mainViewWrap" style="display:none;">
+    <button class="view-more-btn" id="mainViewBtn">View More →</button>
+  </div>
+  </div>
+  <div class="view-more-wrap" id="mainViewWrap" style="display:none;">
+    <button class="view-more-btn" id="mainViewBtn">View More →</button>
+  </div>
+
+  <!-- MUSIC VIDEOS TAB — shown separately when Music Videos filter is active -->
+  <div id="section-musicvideos" style="display:none;">
+    <!--
+      Add music videos here.
+      Replace MUSIC_VIDEO_ID with the YouTube video ID.
+    -->
+    <div class="video-grid" style="margin-bottom:12px;">
+      <div class="video-card landscape" data-videoid="U8Q4VV0CJZA">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/U8Q4VV0CJZA/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Sliimi [For Me]</div>
+          <div class="video-meta">visualizer</div>
+        </div>
+      </div>
+
+      <div class="video-card landscape" data-videoid="YuF2uM2r-no">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/YuF2uM2r-no/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Jozi [Lami]</div>
+          <div class="video-meta">Music Video</div>
+        </div>
+      </div>
+            <div class="video-card landscape" data-videoid="s3J6J5ndxiE">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/s3J6J5ndxiE/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Sliimi [Time and Space] II </div>
+          <div class="video-meta">visualizer</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="4ZJ_j0wJwhs">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/4ZJ_j0wJwhs/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Sliimi [Time and Space] Acoustics Version</div>
+          <div class="video-meta">visualizer</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="px_z6lgqltA">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/px_z6lgqltA/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Sliimi [Time and Space] Studio</div>
+          <div class="video-meta">visualizer</div>
+        </div>
+      </div>
+            <div class="video-card landscape" data-videoid="E-0Q9azeOZo">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/E-0Q9azeOZo/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Sliimi [Time and Space]</div>
+          <div class="video-meta">visualizer</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="kYA1_VwPhMQ">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/kYA1_VwPhMQ/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Sliimi [Toyin Tomato]</div>
+          <div class="video-meta">Music Video</div>
+        </div>
+      </div>
+            <div class="video-card landscape" data-videoid="UaRfMAUTkFk">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/UaRfMAUTkFk/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Sliimi [Morowore]</div>
+          <div class="video-meta">visualizer</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="ibPN4B7dzms">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/ibPN4B7dzms/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">OTK [What if I]</div>
+          <div class="video-meta">Music Video</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="WPGB70utCXo">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/WPGB70utCXo/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">MickeySmart [ STUDIO SESSION]</div>
+          <div class="video-meta">visualizer</div>
+        </div>
+      </div>
+            <div class="video-card landscape" data-videoid="Xh2Hp1OS-w8">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/Xh2Hp1OS-w8/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Pelamo [Spiritual Sense]</div>
+          <div class="video-meta">PERFORMANCE</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="dBftidYdw9I">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/dBftidYdw9I/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Daebosh [Mood]</div>
+          <div class="video-meta">Performance</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="vkUg5LQCH50">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/vkUg5LQCH50/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Exteria [L.I.S]</div>
+          <div class="video-meta">Performance</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="6ekkwXzmfL4">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/6ekkwXzmfL4/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">MickeySmart [Banging]</div>
+          <div class="video-meta">visualizer</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="-wcsUyKclLI">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/-wcsUyKclLI/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">MIO Cypher 2.0 </div>
+          <div class="video-meta">visualizer</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="Dq32jbZ8Uro">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/Dq32jbZ8Uro/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">MickeySmart [Your Body]</div>
+          <div class="video-meta">visualizer</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="svDTXmRxqEQ">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/svDTXmRxqEQ/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Omo Oloogo [Fredway]</div>
+          <div class="video-meta">visualizer</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="O0nOQeOtR7k">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/O0nOQeOtR7k/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">MIO Cypher [1.0]</div>
+          <div class="video-meta">visualizer</div>
+        </div>
+      </div>
+    </div>
+    
+      </div>
+    </div>
+  </div>
+
+  <!-- brandworks VIDEOS — shown when brandworks filter is active -->
+  <div id="section-brandworksvideos" style="display:none; margin-top:32px;">
+    <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;">Brand &amp; Client Videos</div>
+    <!--
+      Add brandworks brand videos here:
+      <div class="video-card landscape" data-videoid="YOUR_ID">
+        ...
+      </div>
+    -->
+    <div class="video-grid">
+      <div class="video-card landscape" data-videoid="K916AwSl-TE">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/K916AwSl-TE/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Bikers Gathering </div>
+          <div class="video-meta">NAIJABIKERS</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="CQt9Gea7rzE">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/CQt9Gea7rzE/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">Flash Ride Xmas Campaign </div>
+          <div class="video-meta">FLASHRIDE BRAND</div>
+        </div>
+      </div>
+      <div class="video-card landscape" data-videoid="-DyXBFvsJtY">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/-DyXBFvsJtY/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">BBM Biker</div>
+          <div class="video-meta">NAIJABIKERS</div>
+        </div>
+      </div>
+	  <div class="video-card landscape" data-videoid="MoW1ycivuYc">
+        <div class="video-thumb-wrap">
+          <img src="https://img.youtube.com/vi/MoW1ycivuYc/hqdefault.jpg" alt="" />
+          <div class="video-play-btn">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">BMW M1000 Spec Campaign</div>
+          <div class="video-meta">NAIJABIKERS</div>
+        </div>
+    </div>
+  </div>
+
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-visual reveal">
+    <div class="about-frame">
+      <div class="about-img-slot">
+        
+        <div class="slot-lbl" style="color:#3a3a3a;"> <img src="images/about.webp" style="width:70%;height:auto;display:block;" alt="TiwhiMode" /></div>
+      </div>
+      <div class="about-accent-border"></div>
+    </div>
+      </div>
+  <div class="reveal">
+    <h2 class="section-label">About</h2>
+	
+    <p class="about-desc">
+      I’m Tiwhi — a Nigerian visual artist and Creative Director specializing in photography and videography that goes beyond documentation. I create visuals that don’t just capture moments, but translate them into feeling and story.<br><br>
+      From editorial portraits to brandworks campaigns and cinematic short films, I approach every project with a bold, intentional eye — crafting imagery that connects, elevates, and leaves a lasting impression. The camera is my language, and every frame is spoken with purpose.
+    </p>
+	<p class="about-quote">"Every frame is a decision. Every cut is a statement."</p>
+    <div style="display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;">
+      <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 0C2.46 0 0 2.46 0 5.5c0 3.85 5.5 8.5 5.5 8.5S11 9.35 11 5.5C11 2.46 8.54 0 5.5 0zm0 7.5A2 2 0 1 1 5.5 3.5a2 2 0 0 1 0 4z" fill="#ff3d1f"/></svg>
+      Lagos, Nigeria
+    </div><div class="skills-list">
+      <span class="skill-tag">Photography</span>
+      <span class="skill-tag">Videography</span>
+      <span class="skill-tag">Video Editing</span>
+      <span class="skill-tag">Color Grading</span>
+      <span class="skill-tag">brandworks</span>
+      <span class="skill-tag">Events</span>
+      <span class="skill-tag">Short Film</span>
+    </div>
+  
+  <div class="stats-row">
+      <div class="stat-item"><div class="stat-num">5+</div><div class="stat-label">Years Active</div></div>
+      <div class="stat-item"><div class="stat-num">120+</div><div class="stat-label">Projects</div></div>
+      <div class="stat-item"><div class="stat-num">40+</div><div class="stat-label">Clients</div></div>
+    </div>
+</section>
+
+
+<div class="section-divider"></div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="reveal">
+    <h2 class="section-label">Contact</h2>
+    <div class="contact-big">Let's create<br><span>something</span>unforgettable.</div>
+    <p class="contact-desc">Open for commissions, collaborations, and brandworks projects. Reach out — let's talk about your vision.</p>
+    <div class="contact-links">
+      <a href="mailto:tiwhimode@gmail.com" class="contact-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+        tiwhimode@gmail.com
+      </a>
+      <!-- INSTAGRAM -->
+      <a href="https://instagram.com/tiwhimode" target="_blank" class="contact-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+        @tiwhimode on Instagram
+      </a>
+      <!-- TIKTOK -->
+      <a href="https://tiktok.com/@tiwhimode" target="_blank" class="contact-link">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.84 1.55V6.79a4.85 4.85 0 0 1-1.07-.1z"/></svg>
+        @tiwhimode on TikTok
+      </a>
+      <!-- WHATSAPP — replace YOUR_NUMBER with your number incl. country code e.g. 2348012345678 -->
+      <a href="https://wa.me/2348147873750" target="_blank" class="contact-link">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+        WhatsApp and call
+      </a>
+    </div>
+  </div>
+  <div class="reveal">
+    <div class="contact-form">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Name</label><input class="form-input" type="text" placeholder="Your name" id="fname" /></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="your@email.com" id="femail" /></div>
+      </div>
+      <div class="form-group"><label class="form-label">Project Type</label><input class="form-input" type="text" placeholder="e.g. Photography shoot, Brand video..." id="ftype" /></div>
+      <div class="form-group"><label class="form-label">Tell me about your project</label><textarea class="form-textarea" rows="6" placeholder="Share your vision, timeline, budget..." id="fmessage"></textarea></div>
+      <button class="submit-btn" id="submitBtn">Send Message →</button>
+      <div class="form-success" id="formSuccess">✓ Message received — I'll be in touch soon.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Tiwhi<span>Mode</span></div>
+  <div class="footer-socials">
+    <!-- Instagram -->
+    <a href="https://instagram.com/tiwhimode" target="_blank" class="footer-social-link" title="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+    </a>
+    <!-- TikTok -->
+    <a href="https://tiktok.com/@tiwhimode" target="_blank" class="footer-social-link" title="TikTok">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.84 1.55V6.79a4.85 4.85 0 0 1-1.07-.1z"/></svg>
+    </a>
+    <!-- WhatsApp -->
+    <a href="https://wa.me/2348147873750" target="_blank" class="footer-social-link" title="WhatsApp">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+    </a>
+  </div>
+  <div class="footer-copy">© 2026 TiwhiMode — All Rights Reserved</div>
+  <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:#333;">Designed &amp; Developed by <a href="https://linkedin.com/in/dtbuildx" target="_blank" style="color:#ff3d1f;text-decoration:underline;text-underline-offset:3px;letter-spacing:0.15em;">dtBuildX</a></div>
+</footer>
+
+<script>
+  // ── HAMBURGER ──
+  const hamburger = document.getElementById('hamburger');
+  const navDrawer = document.getElementById('navDrawer');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    navDrawer.classList.toggle('open');
+    document.body.style.overflow = navDrawer.classList.contains('open') ? 'hidden' : '';
+  });
+  document.querySelectorAll('.drawer-link').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      navDrawer.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+
+  // ── HERO CTA → all tab ──
+  document.getElementById('viewWorkBtn').addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-filter="all"]').classList.add('active');
+    showSection('all');
+    document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // ── FILTER TABS ──
+  function showSection(filter) {
+    document.querySelectorAll('.gallery-section').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('section-' + filter);
+    if (target) target.classList.add('active');
+  }
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      showSection(btn.dataset.filter);
+    });
+  });
+
+  // ── LIGHTBOX ──
+  const lightbox = document.getElementById('lightbox');
+  const lightboxInner = document.getElementById('lightboxInner');
+
+  function openLightboxPhoto(cat, imgSrc, bgColor) {
+    lightboxInner.innerHTML = imgSrc
+      ? `<img class="lightbox-img" src="${imgSrc}" alt=""/><div class="lightbox-cat">${cat}</div>`
+      : `<div class="lightbox-ph" style="background:${bgColor||'#111'};"><div style="font-size:18px;color:#333;">＋</div><div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#444;">Replace with your image</div></div><div class="lightbox-cat">${cat}</div>`;
+    lightbox.classList.add('open');
+  }
+
+  function openLightboxVideo(videoId) {
+    window.open('https://www.youtube.com/watch?v=' + videoId, '_blank');
+  }
+
+  document.getElementById('lightboxClose').addEventListener('click', () => {
+    lightboxInner.innerHTML = '';
+    lightbox.classList.remove('open');
+  });
+  lightbox.addEventListener('click', e => {
+    if (e.target === lightbox) { lightboxInner.innerHTML = ''; lightbox.classList.remove('open'); }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { lightboxInner.innerHTML = ''; lightbox.classList.remove('open'); }
+  });
+
+  // ── GALLERY — single grid, filter by data-cat ──
+  const mainGrid = document.getElementById('mainGrid');
+  const mainViewWrap = document.getElementById('mainViewWrap');
+  const mainViewBtn = document.getElementById('mainViewBtn');
+
+  // ── SEEDED SHUFFLE — same mix every time, change seed number to reorder ──
+  function seededRandom(seed) {
+    let s = seed;
+    return function() {
+      s = (s * 16807 + 0) % 2147483647;
+      return (s - 1) / 2147483646;
+    };
+  }
+
+  function shuffleWithSeed(arr, seed) {
+    const rand = seededRandom(seed);
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // Change this number (e.g. 42, 100, 999) to get a different fixed mix
+  const SHUFFLE_SEED = 13;
+
+  function applyFilter(filter) {
+    const musicSection = document.getElementById('section-musicvideos');
+    const brandworksVideos = document.getElementById('section-brandworksvideos');
+    musicSection.style.display = filter === 'musicvideos' ? 'block' : 'none';
+    brandworksVideos.style.display = filter === 'brandworks' ? 'block' : 'none';
+
+    if (filter === 'musicvideos') {
+      mainGrid.style.display = 'none';
+      mainViewWrap.style.display = 'none';
+      return;
+    }
+    mainGrid.style.display = 'grid';
+
+    const allItems = Array.from(mainGrid.querySelectorAll('.grid-item'));
+
+    // shuffle with fixed seed when showing All Work
+    if (filter === 'all') {
+      const shuffled = shuffleWithSeed(allItems, SHUFFLE_SEED);
+      shuffled.forEach(item => mainGrid.appendChild(item));
+    }
+
+    const updatedItems = Array.from(mainGrid.querySelectorAll('.grid-item'));
+    let visible = [];
+    updatedItems.forEach(item => {
+      const match = filter === 'all' || item.dataset.cat === filter;
+      item.style.display = match ? '' : 'none';
+      item.classList.remove('vm-hidden');
+      if (match) visible.push(item);
+    });
+
+    if (visible.length > 6) {
+      visible.slice(6).forEach(el => el.classList.add('vm-hidden'));
+      mainViewWrap.style.display = 'block';
+      mainViewBtn.textContent = 'View More →';
+    } else {
+      mainViewWrap.style.display = 'none';
+    }
+  }
+
+  if (mainViewBtn) {
+    mainViewBtn.addEventListener('click', () => {
+      mainGrid.querySelectorAll('.vm-hidden').forEach(el => el.classList.remove('vm-hidden'));
+      mainViewWrap.style.display = 'none';
+    });
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilter(btn.dataset.filter);
+    });
+  });
+
+  applyFilter('all');
+
+  // ── GRID ITEM CLICKS ──
+  const bgColors = ['#111008','#081111','#110811','#110808','#08080f','#0f0f08','#110a08','#080f0a','#0a1108'];
+  function attachGridClicks(container) {
+    container.querySelectorAll('.grid-item').forEach((item, i) => {
+      item.addEventListener('click', () => {
+        const cat = item.dataset.cat || '';
+        const img = item.querySelector('img');
+        openLightboxPhoto(cat, img ? img.src : null, bgColors[i % bgColors.length]);
+      });
+    });
+  }
+  if (mainGrid) attachGridClicks(mainGrid);
+
+  // ── VIDEO CARD CLICKS ──
+  document.querySelectorAll('.video-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.dataset.videoid;
+      const placeholders = ['LANDSCAPE_VIDEO_ID_2','PORTRAIT_VIDEO_ID_1','PORTRAIT_VIDEO_ID_2'];
+      if (id && !placeholders.includes(id)) {
+        window.open('https://www.youtube.com/watch?v=' + id, '_blank');
+      }
+    });
+  });
+
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 60); ro.unobserve(e.target); }
+    });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+  // ── CONTACT FORM ──
+  document.getElementById('submitBtn').addEventListener('click', () => {
+    const n = document.getElementById('fname').value.trim();
+    const em = document.getElementById('femail').value.trim();
+    const m = document.getElementById('fmessage').value.trim();
+    if (!n || !em || !m) { alert('Please fill in your name, email, and message.'); return; }
+    document.getElementById('formSuccess').style.display = 'block';
+    const btn = document.getElementById('submitBtn');
+    btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none';
+  });
+
+  // ── SCROLL TO TOP ──
+  const scrollTopBtn = document.getElementById('scrollTopBtn');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) {
+      scrollTopBtn.classList.add('visible');
+    } else {
+      scrollTopBtn.classList.remove('visible');
+    }
+  });
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+</body>
+</html>
